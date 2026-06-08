@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Streamlit Web Dashboard Service
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: primetrade-dashboard:latest
+    container_name: primetrade_dashboard
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  # Interactive CLI Service
+  cli:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: primetrade-cli:latest
+    container_name: primetrade_cli
+    command: python cli.py
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+    # Keep STDIN open and allocate pseudo-TTY for interactive user inputs
+    stdin_open: true
+    tty: true

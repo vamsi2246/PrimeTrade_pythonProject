@@ -70,6 +70,11 @@ graph TD
 │   └── test_parser.py       # Unit tests for raw API schema parsing
 ├── cli.py                   # Main CLI Entrypoint (Typer & Rich)
 ├── streamlit_app.py         # Companion UI Dashboard (Streamlit)
+├── Dockerfile               # Production multi-stage Docker build file
+├── docker-compose.yml       # Orchestrates CLI and Dashboard containers
+├── railway.json             # Railway App deployment configuration
+├── portfolio_assets.md      # Resume bullets and interview guides
+├── CONTRIBUTING.md          # Contribution guidelines
 ├── .env.example             # Configuration template
 ├── .gitignore               # Ignored files configuration
 ├── requirements.txt         # Package dependencies
@@ -81,58 +86,41 @@ graph TD
 
 ## Setup & Installation
 
-### Prerequisites
-- Python 3.12 or 3.13
-- Git
+### Local Machine Deployment
+Ensure you have Python 3.12 or 3.13 installed.
 
-### 1. Clone & Set Up Directory
-```bash
-cd /Users/apple/Desktop/PrimeTrade_pythonProject
-```
+1. **Activate Virtual Environment**:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Linux/macOS
+   # or venv\Scripts\activate on Windows
+   ```
 
-### 2. Create Virtual Environment
-```bash
-python3 -m venv venv
-source venv/bin/activate  # On Linux/macOS
-# or venv\Scripts\activate on Windows
-```
+2. **Install Dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### 3. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Create and Configure Environment File
-Copy `.env.example` to a new `.env` file at the root:
-```bash
-cp .env.example .env
-```
-Open `.env` and fill in your API credentials:
-```env
-BINANCE_API_KEY=your_actual_testnet_api_key
-BINANCE_SECRET_KEY=your_actual_testnet_secret_key
-BINANCE_BASE_URL=https://testnet.binancefuture.com
-BINANCE_USE_TESTNET=True
-LOG_LEVEL=INFO
-```
-
----
-
-## Creating Binance Testnet Account & API Keys
-
-To retrieve your test keys:
-1. Navigate to the [Binance Futures Testnet Web Platform](https://testnet.binancefuture.com).
-2. Register an account (or login using your GitHub/Google account).
-3. Scroll down to the bottom of the page to find the **API Key** section.
-4. Click **Generate API Key**.
-5. Copy both the **API Key** and **Secret Key** immediately and paste them into your `.env` file.
+3. **Configure Environment Variables**:
+   Copy `.env.example` to `.env` and fill in your keys:
+   ```bash
+   cp .env.example .env
+   ```
+   Modify the fields inside `.env`:
+   ```env
+   BINANCE_API_KEY=your_actual_testnet_api_key
+   BINANCE_SECRET_KEY=your_actual_testnet_secret_key
+   BINANCE_BASE_URL=https://testnet.binancefuture.com
+   BINANCE_USE_TESTNET=True
+   LOG_LEVEL=INFO
+   ```
 
 ---
 
 ## Run Commands
 
 ### 1. Run Interactive CLI
-Execute with no arguments to launch the interactive terminal:
+Execute with no arguments to launch the interactive menu:
 ```bash
 python cli.py
 ```
@@ -169,49 +157,81 @@ pytest tests/ -v
 
 ---
 
-## Example Outputs
+## Docker Deployment Guide
 
-### CLI Output: Successful MARKET Order
-```
-------------------------------------
-ORDER REQUEST
-------------------------------------
-Symbol      BTCUSDT
-Side        BUY
-Type        MARKET
-Quantity    0.01
+You can run the web dashboard or CLI tool inside a Docker container to ensure system isolation.
 
-Submitting...
-
-------------------------------------
-ORDER RESPONSE
-------------------------------------
-Order ID        982173456
-Status          FILLED
-Executed Qty    0.01
-Average Price   108200.15
-
-✔ Trade completed successfully.
+### 1. Build Docker Image
+```bash
+docker build -t trading-bot .
 ```
 
-### Log File Output (`logs/trading.log`)
+### 2. Run Streamlit UI Dashboard Container
+Expose the port and feed in local environment keys:
+```bash
+docker run -d -p 8501:8501 --name primetrade_ui --env-file .env -v "$(pwd)/logs:/app/logs" trading-bot
 ```
-2026-06-08 14:45:01.102 | INFO     | bot.orders:execute_order:23 - Pre-flight Order Setup | Symbol: BTCUSDT | Side: BUY | Type: MARKET | Qty: 0.01
-2026-06-08 14:45:01.103 | INFO     | bot.orders:execute_order:35 - Validation Passed | Target: BTCUSDT | Side: BUY | Type: MARKET
-2026-06-08 14:45:01.456 | INFO     | bot.logger:log_api_call:57 - API Call | Endpoint: futures_create_order | Payload: {'args': (), 'kwargs': {'symbol': 'BTCUSDT', 'side': 'BUY', 'quantity': 0.01, 'type': 'MARKET'}} | Response: {'orderId': 982173456, ...} | Latency: 352.41ms | Retries: 0
-2026-06-08 14:45:01.458 | INFO     | bot.orders:execute_order:52 - Order Complete | ID: 982173456 | Status: FILLED | AvgPrice: 108200.15
+Access the UI at: `http://localhost:8501`.
+
+### 3. Run Interactive CLI Container
+Run the container interactively by overriding the default entry command:
+```bash
+docker run -it --name primetrade_cli --env-file .env -v "$(pwd)/logs:/app/logs" trading-bot python cli.py
+```
+
+### 4. Using Docker Compose
+Alternatively, manage both services via Docker Compose:
+```bash
+# Run Streamlit dashboard in background
+docker-compose up -d dashboard
+
+# Run interactive CLI in foreground
+docker-compose run --rm cli
 ```
 
 ---
 
-## Known Limitations & Future Roadmap
+## Cloud Deployment Guides
 
-- **Precision/Rounding Constraints**: Binance requires price and lot size formatting rules per asset. Currently, input quantities must respect asset-specific lot step-sizes.
-  - *Roadmap*: Implement an exchange information cache to load step-size parameters (`priceFilter`, `lotSizeFilter`) dynamically and auto-round values.
-- **WebSocket Streaming**: Streamlit uses polling for account details.
-  - *Roadmap*: Add continuous websocket listener threads to push real-time order update messages directly to UI containers.
-- **Multi-Asset Portfolio Metrics**: Dashboard currently supports displaying basic balances.
-  - *Roadmap*: Incorporate dynamic equity curves and position sizing recommendation models based on trade history.
+### 1. Render Deployment (Web App)
+To deploy the Streamlit dashboard to Render:
+1. Fork this repository on GitHub.
+2. Sign in to [Render](https://render.com).
+3. Click **New +** and select **Web Service**.
+4. Connect your GitHub repository.
+5. Configure the service:
+   - **Environment**: `Docker`
+   - **Dockerfile Path**: `Dockerfile` (Render will build the container automatically)
+   - **Instance Type**: Free/Starter
+6. Under **Advanced**, add the following environment variables:
+   - `BINANCE_API_KEY`: *Your Binance Testnet API Key*
+   - `BINANCE_SECRET_KEY`: *Your Binance Testnet Secret Key*
+   - `BINANCE_BASE_URL`: `https://testnet.binancefuture.com`
+   - `BINANCE_USE_TESTNET`: `True`
+7. Click **Deploy Web Service**. Render will spin up the container and provide a public URL.
+
+### 2. Railway Deployment
+Railway uses the root `railway.json` and automatically picks up our Docker configuration:
+1. Connect your repository to [Railway](https://railway.app).
+2. Add your environmental variables (`BINANCE_API_KEY`, `BINANCE_SECRET_KEY`, etc.) in the Railway dashboard settings tab.
+3. Railway will trigger the build using `Dockerfile` and expose it through the generated web domain.
+
+---
+
+## Creating Binance Testnet Account & API Keys
+
+To retrieve your test keys:
+1. Navigate to the [Binance Futures Testnet Web Platform](https://testnet.binancefuture.com).
+2. Register an account (or login using your GitHub/Google account).
+3. Scroll down to the bottom of the page to find the **API Key** section.
+4. Click **Generate API Key**.
+5. Copy both the **API Key** and **Secret Key** immediately and paste them into your `.env` file.
+
+---
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for style conventions, testing standards, and development guidelines.
 
 ---
 
