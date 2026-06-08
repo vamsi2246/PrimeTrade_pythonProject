@@ -1,0 +1,18 @@
+services:
+  # Streamlit Web Dashboard (Render Web Service)
+  - type: web
+    name: primetrade-dashboard
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "streamlit run streamlit_app.py --server.port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: BINANCE_USE_TESTNET
+        value: "True"
+      - key: BINANCE_API_KEY
+        sync: false # Set securely in Render Dashboard
+      - key: BINANCE_SECRET_KEY
+        sync: false # Set securely in Render Dashboard
+      - key: LOG_LEVEL
+        value: "INFO"
