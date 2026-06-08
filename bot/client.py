@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 from binance.client import Client as BinanceClient
 from binance.exceptions import BinanceAPIException, BinanceRequestException
 from requests.exceptions import RequestException
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type, before_sleep_log
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 from bot.exceptions import BinanceAPIError, NetworkError, OrderPlacementError
 from bot.logger import logger, log_api_call
@@ -122,8 +122,7 @@ class BinanceFuturesClient:
 
         Maps internal STOP_LIMIT enum values to the appropriate exchange API format.
         """
-        # Map our STOP_LIMIT to binance STOP order type
-        binance_type = order_type
+
         params = {
             "symbol": symbol,
             "side": side,

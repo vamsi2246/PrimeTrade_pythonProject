@@ -1,3 +1,6 @@
+from typing import Optional
+
+
 class TradingBotError(Exception):
     """Base exception for all trading bot errors."""
     pass
@@ -21,7 +24,7 @@ class NetworkError(TradingBotError):
 class BinanceAPIError(TradingBotError):
     """Raised when Binance API returns an error status code or failure response."""
 
-    def __init__(self, message: str, status_code: int = None, error_code: int = None):
+    def __init__(self, message: str, status_code: Optional[int] = None, error_code: Optional[int] = None):
         super().__init__(message)
         self.status_code = status_code
         self.error_code = error_code

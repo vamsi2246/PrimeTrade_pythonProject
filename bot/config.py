@@ -1,5 +1,4 @@
-import os
-from typing import Optional
+
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from bot.exceptions import ConfigError
