@@ -1,0 +1,5 @@
+2026-06-08 14:48:10.512 | INFO     | bot.orders:execute_order:23 - Pre-flight Order Setup | Symbol: ETHUSDT | Side: SELL | Type: LIMIT | Qty: 0.1 | Price: 3500.0
+2026-06-08 14:48:10.513 | INFO     | bot.orders:execute_order:35 - Validation Passed | Target: ETHUSDT | Side: SELL | Type: LIMIT
+2026-06-08 14:48:10.925 | INFO     | bot.logger:log_api_call:57 - API Call | Endpoint: futures_create_order | Payload: {'args': (), 'kwargs': {'symbol': 'ETHUSDT', 'side': 'SELL', 'quantity': 0.1, 'type': 'LIMIT', 'price': 3500.0, 'timeInForce': 'GTC'}} | Response: {'orderId': 982173499, 'clientOrderId': 'pt_bot_lim_8391', 'symbol': 'ETHUSDT', 'status': 'NEW', 'side': 'SELL', 'type': 'LIMIT', 'price': '3500.00', 'avgPrice': '0.00', 'origQty': '0.1', 'executedQty': '0.0', 'cumQty': '0.0', 'cumQuote': '0.0', 'timeInForce': 'GTC', 'updateTime': 1770453910810} | Latency: 411.12ms | Retries: 0
+2026-06-08 14:48:10.926 | INFO     | bot.orders:execute_order:48 - Order executed. Normalizing response payload...
+2026-06-08 14:48:10.927 | INFO     | bot.orders:execute_order:52 - Order Complete | ID: 982173499 | Status: NEW | AvgPrice: 0.0

@@ -1,0 +1,5 @@
+2026-06-08 14:45:01.102 | INFO     | bot.orders:execute_order:23 - Pre-flight Order Setup | Symbol: BTCUSDT | Side: BUY | Type: MARKET | Qty: 0.01
+2026-06-08 14:45:01.103 | INFO     | bot.orders:execute_order:35 - Validation Passed | Target: BTCUSDT | Side: BUY | Type: MARKET
+2026-06-08 14:45:01.456 | INFO     | bot.logger:log_api_call:57 - API Call | Endpoint: futures_create_order | Payload: {'args': (), 'kwargs': {'symbol': 'BTCUSDT', 'side': 'BUY', 'quantity': 0.01, 'type': 'MARKET'}} | Response: {'orderId': 982173456, 'clientOrderId': 'pt_bot_mkt_1192', 'symbol': 'BTCUSDT', 'status': 'FILLED', 'side': 'BUY', 'type': 'MARKET', 'price': '0.00', 'avgPrice': '108200.15', 'origQty': '0.01', 'executedQty': '0.01', 'cumQty': '0.01', 'cumQuote': '1082.0015', 'timeInForce': 'GTC', 'updateTime': 1770453901350} | Latency: 352.41ms | Retries: 0
+2026-06-08 14:45:01.457 | INFO     | bot.orders:execute_order:48 - Order executed. Normalizing response payload...
+2026-06-08 14:45:01.458 | INFO     | bot.orders:execute_order:52 - Order Complete | ID: 982173456 | Status: FILLED | AvgPrice: 108200.15
